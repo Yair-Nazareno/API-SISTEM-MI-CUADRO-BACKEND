@@ -1,0 +1,30 @@
+*.sqlite*
+# Dependencias de Composer
+/vendor/
+
+# Configuración de entorno
+.env
+.env.*.backup
+
+# Cache y logs
+/storage/*.key
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+
+# Archivos de IDE
+.idea/
+.vscode/
+
+# Node modules si usas npm en Laravel Mix
+/node_modules/
+
+# Archivos de compilación
+/public/hot
+/public/storage
+/public/mix-manifest.json
+
+# Otros
+Homestead.json
+Homestead.yaml
