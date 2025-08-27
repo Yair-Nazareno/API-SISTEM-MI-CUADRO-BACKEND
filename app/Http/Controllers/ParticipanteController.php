@@ -16,7 +16,7 @@ class ParticipanteController extends Controller
         try {
             $perPage = $request->get('per_page', 2);
 
-            $participante = Participant::paginate($perPage)->makeHidden(['id', 'created_at', 'updated_at']);
+            $participante = Participant::paginate($perPage)->makeHidden([ 'created_at', 'updated_at']);
             return response()->json(['message' => '✅ Peticion correcta ','data'=>$participante] , 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'Error al obtener participantes', 'details' => $e->getMessage()], 500);
@@ -41,10 +41,20 @@ class ParticipanteController extends Controller
             'user_id' => 'required|exists:users,id',
             'cuadro_id' => 'required|exists:cuadros,id',
             'fecha_inicio' => 'required|date',
-            'activo' => 'boolean',
+            'numero_turno' => 'required|integer',
+            'estado' => 'in:activo,retirado,pagado',
         ]);
 
+        $existe =Participant::where('user_id',$request->user_id)
+            ->where('cuadro_id',$request->cuadro_id)
+            ->first();
+
+
         try {
+            if ($existe) {
+                return response()->json(['error' => 'El participante ya existe en este cuadro'], 400);
+            }
+
             $participante = Participant::create($request->all());
             return response()->json($participante, 201);
         } catch (Exception $e) {
@@ -56,16 +66,19 @@ class ParticipanteController extends Controller
     public function update(Request $request, $id) : JsonResponse
     {
         $request->validate([
-            'user_id' => 'exists:users,id',
-            'cuadro_id' => 'exists:cuadros,id',
+
             'fecha_inicio' => 'date',
-            'activo' => 'boolean',
+            'numero_turno' => 'integer',
+            'estado' => 'in:activo,retirado,pagado',
+
+
         ]);
 
         try {
             $participante = Participant::findOrFail($id);
             $participante->update($request->all());
-            return response()->json($participante, 200);
+            return response()->json( ['message' => '✅ Participante actualizado correctamente', 'data' => $participante],200);
+
         } catch (Exception $e) {
             return response()->json(['error' => 'Error al actualizar participante', 'details' => $e->getMessage()], 500);
         }
